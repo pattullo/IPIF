@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillFlow</title>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.5/dagre.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.5.0/cytoscape-dagre.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>SkillFlow</h1>
+            <div class="header-controls">
+                <button id="legend-toggle" title="Show/Hide Legend">
+                    <i class="fas fa-question-circle"></i>
+                </button>
+            </div>
+        </header>
+
+        <div id="timeline">
+            <!-- Timeline will be dynamically generated -->
+        </div>
+
+        <div class="main-container">
+            <div id="domain-labels">
+                <!-- Domain labels will be dynamically generated -->
+            </div>
+            
+            <div class="visualization-container">
+                <div id="cy"></div>
+            </div>
+        </div>
+
+        <!-- Legend Panel -->
+        <div id="legend-panel" class="hidden">
+            <div class="legend-header">
+                <h3>Legend</h3>
+                <button id="legend-close"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="legend-content">
+                <div class="legend-section">
+                    <h4>Node Types</h4>
+                    <div class="legend-item">
+                        <div class="legend-symbol hexagon"></div>
+                        <span>Certification</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-symbol circle"></div>
+                        <span>Course/Training</span>
+                    </div>
+                </div>
+                <div class="legend-section">
+                    <h4>Status</h4>
+                    <div class="legend-item">
+                        <div class="legend-symbol completed"></div>
+                        <span>Completed</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-symbol in-progress"></div>
+                        <span>In Progress</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-symbol planned"></div>
+                        <span>Planned</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Node Modal -->
+        <div id="node-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modal-title"></h2>
+                    <button id="modal-edit" class="edit-button">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button id="modal-close" class="close-button">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="modal-view-content" class="modal-body">
+                    <!-- View content will be dynamically generated -->
+                </div>
+                <div id="modal-edit-content" class="modal-body hidden">
+                    <!-- Edit form will be dynamically generated -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
