@@ -1,0 +1,32 @@
+/* Responsive design */
+@media (max-width: 768px) {
+    .filter-container {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .filter-group {
+        width: 100%;
+    }
+
+    .search-group {
+        width: 100%;
+        max-width: none;
+    }
+
+    .modal-content {
+        width: 95%;
+    }
+}
+
+@media (max-width: 480px) {
+    header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 0.5rem;
+    }
+
+    .header-center {
+        width: 100%;
+    }
+}

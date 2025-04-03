@@ -5,9 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillFlow</title>
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="map-legend.svg">
+    
     <!-- Stylesheets -->
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
     
     <!-- Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
@@ -17,10 +21,32 @@
 <body>
     <div id="app">
         <header>
-            <h1>SkillFlow</h1>
-            <div class="header-controls">
+            <div class="header-left">
+                <h1>SkillFlow</h1>
+            </div>
+            <div class="header-center">
+                <div class="filter-container">
+                    <div class="filter-group">
+                        <label>Domain:</label>
+                        <select id="domain-filter">
+                            <option value="all">All Domains</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Program:</label>
+                        <select id="program-filter">
+                            <option value="all">All Programs</option>
+                        </select>
+                    </div>
+                    <div class="search-group">
+                        <input type="text" id="search-input" placeholder="Search...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
                 <button id="legend-toggle" title="Show/Hide Legend">
-                    <i class="fas fa-question-circle"></i>
+                    <img src="map-legend.svg" alt="Legend" class="legend-icon">
                 </button>
             </div>
         </header>
@@ -30,20 +56,16 @@
         </div>
 
         <div class="main-container">
-            <div id="domain-labels">
-                <!-- Domain labels will be dynamically generated -->
-            </div>
-            
             <div class="visualization-container">
                 <div id="cy"></div>
             </div>
         </div>
 
         <!-- Legend Panel -->
-        <div id="legend-panel" class="hidden">
+        <div id="legend-panel" class="hidden panel">
             <div class="legend-header">
                 <h3>Legend</h3>
-                <button id="legend-close"><i class="fas fa-times"></i></button>
+                <button id="legend-close"><i class="fas fa-xmark"></i></button>
             </div>
             <div class="legend-content">
                 <div class="legend-section">
@@ -76,16 +98,18 @@
         </div>
 
         <!-- Node Modal -->
-        <div id="node-modal" class="modal hidden">
+        <div id="node-modal" class="modal hidden panel">
             <div class="modal-content">
                 <div class="modal-header">
                     <h2 id="modal-title"></h2>
-                    <button id="modal-edit" class="edit-button">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button id="modal-close" class="close-button">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    <div class="modal-controls">
+                        <button id="modal-edit" class="edit-button" title="Edit">
+                            <i class="fas fa-pencil"></i>
+                        </button>
+                        <button id="modal-close" class="close-button" title="Close">
+                            <i class="fas fa-xmark"></i>
+                        </button>
+                    </div>
                 </div>
                 <div id="modal-view-content" class="modal-body">
                     <!-- View content will be dynamically generated -->
@@ -97,6 +121,9 @@
         </div>
     </div>
 
-    <script src="js/main.js"></script>
+    <!-- Main Script (using ES modules) -->
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>
+<!-- End of index.html -->
+<!-- This HTML file serves as the main entry point for the SkillFlow application. It includes the necessary styles, scripts, and structure to render the application interface. The script at the end is responsible for initializing the application and handling user interactions. -->
