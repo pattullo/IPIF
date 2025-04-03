@@ -29,4 +29,10 @@
     .header-center {
         width: 100%;
     }
+
+    #legend-panel {
+        width: 90%;
+        left: 5%;
+        right: 5%;
+    }
 }

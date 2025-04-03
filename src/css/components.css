@@ -19,7 +19,7 @@
 
 #legend-panel {
     position: fixed;
-    top: 20px;
+    top: 70px;
     right: 20px;
     width: 250px;
     z-index: 1000;
@@ -99,6 +99,8 @@
     max-width: 500px;
     max-height: 90vh;
     overflow-y: auto;
+    background-color: white;
+    border-radius: 8px;
 }
 
 .modal-header {
@@ -131,22 +133,51 @@
     padding: 1rem;
 }
 
-/* Domain icon styles */
-.domain-label i {
-    width: 26px;
-    height: 26px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: white;
-    border: 1px solid rgba(0, 0, 0, 0.2);
-    border-radius: 50%;
-    color: #6c757d;
-    padding: 3px;
+.form-group {
+    margin-bottom: 1rem;
 }
 
-.domain-label span {
-    font-weight: 500;
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
     color: #495057;
-    text-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.9rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+}
+
+.form-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+.form-buttons button {
+    padding: 0.375rem 0.75rem;
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+    background-color: white;
+    cursor: pointer;
+}
+
+.form-buttons button[type="submit"] {
+    background-color: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+}
+
+.form-buttons button.cancel {
+    color: #6c757d;
+}
+
+.form-buttons button:hover {
+    opacity: 0.9;
 }

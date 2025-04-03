@@ -1,12 +1,18 @@
 /* Header styles */
+:root {
+    --header-height: 60px;
+    --timeline-height: 80px;
+    --total-offset: calc(var(--header-height) + var(--timeline-height));
+}
+
 header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--header-height);
+    z-index: 1000;
     background-color: #f8f9fa;
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid #dee2e6;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 2rem;
 }
 
 .header-left h1 {
@@ -30,39 +36,28 @@ header {
     justify-content: center;
 }
 
-/* Filter controls */
+/* Filter styles */
 .filter-container {
     display: flex;
-    gap: 1rem;
+    gap: 0.75rem;
     align-items: center;
 }
 
-.filter-group {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.filter-group label {
-    color: #495057;
-    font-weight: 500;
-    font-size: 0.9rem;
-}
-
-.filter-group select {
-    padding: 0.375rem 2rem 0.375rem 0.75rem;
+.compact-filter {
+    padding: 0.375rem 1.75rem 0.375rem 0.75rem;
     font-size: 0.9rem;
     border: 1px solid #ced4da;
     border-radius: 4px;
     background: white url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/></svg>") no-repeat right 0.5rem center/12px 12px;
     appearance: none;
-    min-width: 150px;
+    min-width: 130px;
+    color: #495057;
 }
 
 .search-group {
     position: relative;
     flex: 1;
-    max-width: 300px;
+    max-width: 200px;
 }
 
 .search-group input {
@@ -82,48 +77,70 @@ header {
     pointer-events: none;
 }
 
-/* Main container and visualization */
-.main-container {
-    flex: 1;
-    display: flex;
-    overflow: hidden;
-}
-
-.visualization-container {
-    flex: 1;
-    position: relative;
-    overflow: auto;
-}
-
-#cy {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-}
-
-/* Timeline */
+/* Timeline styles */
 #timeline {
-    padding: 1rem;
-    background-color: #fff;
-    border-bottom: 1px solid #dee2e6;
-    overflow-x: auto;
-    white-space: nowrap;
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    right: 0;
+    height: var(--timeline-height);
+    z-index: 999;
+    background-color: #f8f9fa;
 }
 
 .timeline-segment {
     display: inline-block;
     padding: 0.5rem 1rem;
     border-right: 1px solid #dee2e6;
+    text-align: center;
+    min-width: 80px;
 }
 
 .timeline-year {
-    font-weight: bold;
+    font-weight: 600;
     color: #495057;
 }
 
 .timeline-quarter {
     color: #6c757d;
     font-size: 0.9rem;
+}
+
+.timeline-gap {
+    color: #6c757d;
+    font-style: italic;
+}
+
+.timeline-gap-indicator {
+    padding: 0 1rem;
+}
+
+/* Main container and visualization */
+.main-container {
+    margin-top: var(--total-offset);
+    flex: 1;
+    display: flex;
+    position: relative;
+    overflow: hidden;
+}
+
+.visualization-container {
+    flex: 1;
+    position: relative;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: calc(100vh - var(--total-offset));
+    width: 100%;
+    border: 1px solid #dee2e6;
+}
+
+#cy {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    width: 100% !important;
+    min-height: 100% !important;
 }
 
 /* Domain bands */
@@ -135,6 +152,7 @@ header {
     border-bottom: 1px solid #dee2e6;
     display: flex;
     align-items: center;
+    min-width: 100%;
 }
 
 .domain-label {
@@ -146,4 +164,31 @@ header {
     padding: 0.5rem;
     background-color: transparent;
     z-index: 1;
+}
+
+.domain-label i {
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    color: #6c757d;
+    padding: 3px;
+}
+
+.domain-label span {
+    font-weight: 500;
+    color: #495057;
+    text-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+}
+
+#cy {
+    cursor: default;
+}
+
+#cy .node {
+    cursor: pointer !important;
 }

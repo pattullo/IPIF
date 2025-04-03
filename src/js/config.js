@@ -14,7 +14,8 @@ export const cytoscapeConfig = {
                 'font-size': '12px',
                 'text-max-width': '140px',
                 'padding': '10px',
-                'zoom': 'data(zoom)' // Enable zoom scaling
+                'border-width': 2,
+                'border-color': '#555'
             }
         },
         {
@@ -54,11 +55,21 @@ export const cytoscapeConfig = {
                 'line-color': '#ccc',
                 'target-arrow-color': '#ccc',
                 'target-arrow-shape': 'triangle',
-                'curve-style': 'bezier',
-                'opacity': 0.8
+                'curve-style': 'bezier'
             }
         }
-    ]
+    ],
+    minZoom: 0.5,
+    maxZoom: 2,
+    selectable: true,
+    grabbable: true,
+    zoomingEnabled: true,
+    userZoomingEnabled: true,
+    panningEnabled: true,
+    userPanningEnabled: true,
+    boxSelectionEnabled: false,
+    autoungrabify: false,
+    autounselectify: false
 };
 
 export const domainIcons = new Map([

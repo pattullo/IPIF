@@ -6,7 +6,7 @@
     <title>SkillFlow</title>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="map-legend.svg">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     
     <!-- Stylesheets -->
     <link rel="stylesheet" href="css/styles.css">
@@ -26,18 +26,15 @@
             </div>
             <div class="header-center">
                 <div class="filter-container">
-                    <div class="filter-group">
-                        <label>Domain:</label>
-                        <select id="domain-filter">
-                            <option value="all">All Domains</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Program:</label>
-                        <select id="program-filter">
-                            <option value="all">All Programs</option>
-                        </select>
-                    </div>
+                    <select id="domain-filter" class="compact-filter" aria-label="Filter by Domain">
+                        <option value="all">All Domains</option>
+                    </select>
+                    <select id="program-filter" class="compact-filter" aria-label="Filter by Program">
+                        <option value="all">All Programs</option>
+                    </select>
+                    <select id="provider-filter" class="compact-filter" aria-label="Filter by Provider">
+                        <option value="all">All Providers</option>
+                    </select>
                     <div class="search-group">
                         <input type="text" id="search-input" placeholder="Search...">
                         <i class="fas fa-search"></i>
@@ -125,5 +122,3 @@
     <script type="module" src="js/main.js"></script>
 </body>
 </html>
-<!-- End of index.html -->
-<!-- This HTML file serves as the main entry point for the SkillFlow application. It includes the necessary styles, scripts, and structure to render the application interface. The script at the end is responsible for initializing the application and handling user interactions. -->

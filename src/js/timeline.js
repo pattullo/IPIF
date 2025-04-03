@@ -3,6 +3,9 @@ export function createTimeline(data) {
     const dates = getValidDates(data);
     if (dates.length === 0) return;
 
+    // Clear existing timeline
+    timelineEl.innerHTML = '';
+
     const { minDate, maxDate } = getDateRange(dates);
     const segments = createTimelineSegments(minDate, maxDate, data);
     
@@ -50,8 +53,10 @@ function createTimelineSegments(minDate, maxDate, data) {
         currentDate.setMonth(currentDate.getMonth() + 3);
     }
     
-    // Add planned section
-    segments.push(createPlannedSegment());
+    // Add planned section if there are planned items
+    if (data.learning_items.some(item => item.status === 'Planned')) {
+        segments.push(createPlannedSegment());
+    }
     
     return segments;
 }

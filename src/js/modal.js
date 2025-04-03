@@ -1,22 +1,40 @@
 export function showNodeModal(node) {
+    console.log('Showing modal for node:', node.data());
+    
     const modal = document.getElementById('node-modal');
     const title = document.getElementById('modal-title');
     const viewContent = document.getElementById('modal-view-content');
     const editContent = document.getElementById('modal-edit-content');
     
+    // Reset modal state
+    viewContent.classList.remove('hidden');
+    editContent.classList.add('hidden');
+    document.getElementById('modal-edit').classList.remove('hidden');
+    
+    // Update content
     title.textContent = node.data('name');
     viewContent.innerHTML = createViewContent(node);
     editContent.innerHTML = createEditContent(node);
     
+    // Setup controls
     setupModalControls(modal, node);
+    
+    // Show modal
     modal.classList.remove('hidden');
+    
+    // Ensure modal is visible and centered
+    modal.style.display = 'flex';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
 }
+
 
 function createViewContent(node) {
     let content = `
         <p><strong>Type:</strong> ${node.data('type')}</p>
         <p><strong>Status:</strong> ${node.data('status')}</p>
         <p><strong>Domain:</strong> ${node.data('domain')}</p>
+        <p><strong>Provider:</strong> ${node.data('provider') || 'Not specified'}</p>
     `;
 
     if (node.data('completion_date')) {
@@ -45,7 +63,6 @@ function createViewContent(node) {
 }
 
 function createEditContent(node) {
-    // Create form fields for editing
     return `
         <form id="edit-form">
             <div class="form-group">
@@ -101,7 +118,6 @@ function setupModalControls(modal, node) {
     modal.onclick = (e) => {
         if (e.target === modal) {
             modal.classList.add('hidden');
-            // Reset to view mode
             viewContent.classList.remove('hidden');
             editContent.classList.add('hidden');
             editBtn.classList.remove('hidden');
@@ -110,15 +126,25 @@ function setupModalControls(modal, node) {
 }
 
 function handleFormSubmit(form, node, modal) {
-    // Update node data
     const formData = new FormData(form);
     
-    node.data('name', formData.get('name'));
-    node.data('status', formData.get('status'));
-    node.data('url', formData.get('url'));
+    // Update node data
+    const updatedData = {
+        name: formData.get('name'),
+        status: formData.get('status'),
+        url: formData.get('url')
+    };
+
+    // Update node in visualization
+    Object.entries(updatedData).forEach(([key, value]) => {
+        node.data(key, value);
+    });
     
     // Update node styling based on new status
     updateNodeStyling(node);
+    
+    // Save changes to JSON file
+    saveChangesToJSON(node.data());
     
     // Reset modal to view mode
     document.getElementById('modal-view-content').classList.remove('hidden');
@@ -129,9 +155,28 @@ function handleFormSubmit(form, node, modal) {
     showNodeModal(node);
 }
 
+async function saveChangesToJSON(nodeData) {
+    try {
+        const response = await fetch('/api/update-node', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(nodeData)
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to save changes');
+        }
+
+        console.log('Changes saved successfully');
+    } catch (error) {
+        console.error('Error saving changes:', error);
+        alert('Failed to save changes. Please try again.');
+    }
+}
+
 function updateNodeStyling(node) {
-    // Node styling will be handled by Cytoscape style definitions
-    // Just trigger a visual update
     node.style('opacity', 0.99);
     setTimeout(() => node.style('opacity', 1), 50);
 }
