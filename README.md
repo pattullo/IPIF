@@ -1,10 +1,10 @@
-# SkillFlow
+# IPIF
 
-SkillFlow is an interactive visualization tool for mapping personal and professional development paths. It helps users track and visually present their learning journey.
+IPIF stands for "Iter praeteritum, iter futurum" and refers to the path behind us and the path aheaad. This app is an interactive visualization tool for mapping personal and professional development paths. It helps users track and visually present their learning journey both in terms of all they've accomplished, and what they are working on next.
 
 ## Overview
 
-SkillFlow provides a dynamic, web-based visualization of educational and professional achievements, planned learning paths, and certification requirements. Think of it as a "skill tree" for real-world learning and development.
+The app provides a dynamic, web-based visualization of educational and professional achievements, planned learning paths, and certification requirements. Think of it as a "video game skill tree" for real-world learning and development.
 
 ### Key Features
 
