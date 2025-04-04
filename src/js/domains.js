@@ -1,4 +1,4 @@
-import { domainIcons } from './config.js';
+import { cytoscapeConfig, domainIcons } from './config.js';
 
 export function setupDomains(data) {
     const domains = [...new Set(data.learning_items.map(item => item.domain))];

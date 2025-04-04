@@ -3,54 +3,29 @@ import { setupDomains } from './domains.js';
 import { cytoscapeConfig } from './config.js';
 import { showNodeModal } from './modal.js';
 
-export function initializeVisualization(data) {
+export async function initializeVisualization(data) {
     console.log('Starting visualization initialization');
-    
     try {
-        console.log('Creating Cytoscape instance');
+        // Create Cytoscape instance
         const cy = cytoscape(cytoscapeConfig);
-        console.log('Cytoscape instance created:', cy);
         
-        console.log('Setting up timeline');
-        createTimeline(data);
+        // Wait for all async operations to complete
+        await Promise.all([
+            createTimeline(data),
+            setupDomains(data)
+        ]);
         
-        console.log('Setting up domains');
-        setupDomains(data);
-        
-        console.log('Creating elements');
+        // Create and add elements
         const elements = createElements(data);
-        console.log('Elements created:', elements);
-        
-        console.log('Adding elements to graph');
         cy.add(elements);
         
-        console.log('Applying layout');
-        applyLayout(cy);
+        // Apply layout and return promise
+        await applyLayoutAsync(cy);
         
-        console.log('Fitting view');
         cy.fit(50);
-
-        // Add direct click handler to container
-        const container = document.getElementById('cy');
-        container.addEventListener('click', (event) => {
-            console.log('Container clicked', event);
-            
-            // Get click position relative to container
-            const rect = container.getBoundingClientRect();
-            const position = {
-                x: event.clientX - rect.left,
-                y: event.clientY - rect.top
-            };
-            
-            // Find clicked node
-            const clickedElements = cy.elementsAt(position);
-            const clickedNode = clickedElements.filter('node')[0];
-            
-            if (clickedNode) {
-                console.log('Node clicked:', clickedNode.id());
-                showNodeModal(clickedNode);
-            }
-        });
+        
+        // Set up event listeners
+        setupEventListeners(cy);
         
         return cy;
     } catch (error) {
@@ -87,7 +62,7 @@ function createElements(data) {
                 elements.push({
                     group: 'edges',
                     data: {
-                        id: `${prereq}-${item.id}`,
+                        id: `$${prereq}-$$ {item.id}`,
                         source: prereq,
                         target: item.id
                     }
@@ -99,83 +74,107 @@ function createElements(data) {
     return elements;
 }
 
-function applyLayout(cy) {
-    // Reset any previous transformations
-    cy.reset();
-    
-    // Calculate the total height needed based on number of domains
-    const domains = [...new Set(cy.nodes().map(node => node.data('domain')))];
-    const totalHeight = domains.length * 200;
-    
-    // Ensure the container is tall enough
-    cy.container().style.height = `${totalHeight}px`;
-    
-    const layout = cy.layout({
-        name: 'dagre',
-        rankDir: 'LR',
-        align: 'DL',
-        spacingFactor: 1.2,
-        nodeDimensionsIncludeLabels: true,
-        rankSep: 75,
-        nodeSep: 40,
-        ranker: 'network-simplex',
-        fit: true,
-        padding: 50,
-        animate: false,
-        positions: function(node) {
-            const domain = node.data('domain');
-            const domainIndex = domains.indexOf(domain);
-            const bandHeight = 200;
-            const yPosition = (domainIndex * bandHeight) + (bandHeight / 2);
-            return {
-                y: yPosition
-            };
+function applyLayoutAsync(cy) {
+    return new Promise((resolve, reject) => {
+        try {
+            const layout = cy.layout({
+                name: 'dagre',
+                rankDir: 'LR',
+                align: 'DL',
+                spacingFactor: 1.2,
+                nodeDimensionsIncludeLabels: true,
+                rankSep: 75,
+                nodeSep: 40,
+                ranker: 'network-simplex',
+                fit: true,
+                padding: 50,
+                animate: false,
+                positions: function(node) {
+                    const domain = node.data('domain');
+                    const domains = [...new Set(cy.nodes().map(node => node.data('domain')))];
+                    const domainIndex = domains.indexOf(domain);
+                    const bandHeight = 200;
+                    return {
+                        y: (domainIndex * bandHeight) + (bandHeight / 2)
+                    };
+                },
+                ready: function() {
+                    setTimeout(() => {
+                        adjustZoomAndPosition(cy);
+                        resolve();
+                    }, 100);
+                },
+                error: function(err) {
+                    reject(err);
+                }
+            });
+            
+            layout.run();
+        } catch (error) {
+            reject(error);
         }
     });
+}
 
-    // Run layout and bind events after it's complete
-    layout.run();
-
-    // After layout completes
-    setTimeout(() => {
-        // Adjust zoom to fit width while maintaining domain heights
-        const bb = cy.elements().boundingBox();
-        const containerWidth = cy.width();
-        const widthZoom = containerWidth / bb.w * 0.9;
-        
-        cy.zoom({
-            level: Math.min(Math.max(widthZoom, 0.5), 2),
-            position: {
-                x: bb.x1 + bb.w/2,
-                y: bb.y1 + bb.h/2
+function setupEventListeners(cy) {
+    const container = document.getElementById('cy');
+    
+    // Container click handler
+    container.addEventListener('click', async (event) => {
+        try {
+            const rect = container.getBoundingClientRect();
+            const position = {
+                x: event.clientX - rect.left,
+                y: event.clientY - rect.top
+            };
+            
+            const clickedElements = cy.elementsAt(position);
+            const clickedNode = clickedElements.filter('node')[0];
+            
+            if (clickedNode) {
+                await showNodeModal(clickedNode);
+            }
+        } catch (error) {
+            console.error('Error handling click event:', error);
+        }
+    });
+    
+    // Node-specific event handlers
+    cy.nodes().forEach(node => {
+        node.on('tap', async function(evt) {
+            try {
+                evt.preventDefault();
+                await showNodeModal(this);
+            } catch (error) {
+                console.error('Error handling node tap:', error);
             }
         });
         
-        // Scroll to top of visualization area
-        document.querySelector('.visualization-container').scrollTop = 0;
-        
-        cy.center();
-
-        // Explicitly bind click events to each node
-        cy.nodes().forEach(node => {
-            node.on('tap', function(evt) {
-                console.log('Direct node tap:', this.id());
-                showNodeModal(this);
-                evt.preventDefault();
-            });
-            
-            node.on('mouseover', function(evt) {
-                this.style('border-width', '3px');
-                document.body.style.cursor = 'pointer';
-            });
-            
-            node.on('mouseout', function(evt) {
-                this.style('border-width', '2px');
-                document.body.style.cursor = 'default';
-            });
+        node.on('mouseover', function() {
+            this.style('border-width', '3px');
+            document.body.style.cursor = 'pointer';
         });
+        
+        node.on('mouseout', function() {
+            this.style('border-width', '2px');
+            document.body.style.cursor = 'default';
+        });
+    });
+}
 
-        // Log the number of nodes with events
-        console.log('Events bound to', cy.nodes().length, 'nodes');
-    }, 100);
+function adjustZoomAndPosition(cy) {
+    const bb = cy.elements().boundingBox();
+    const containerWidth = cy.width();
+    const widthZoom = (containerWidth / bb.w) * 0.9;
+    
+    cy.zoom({
+        level: Math.min(Math.max(widthZoom, 0.5), 2),
+        position: {
+            x: bb.x1 + bb.w/2,
+            y: bb.y1 + bb.h/2
+        }
+    });
+    
+    document.querySelector('.visualization-container').scrollTop = 0;
+    cy.center();
 }

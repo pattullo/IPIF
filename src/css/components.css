@@ -181,3 +181,21 @@
 .form-buttons button:hover {
     opacity: 0.9;
 }
+
+/* Cursor styles */
+#cy {
+    cursor: default;
+}
+
+#cy .node {
+    cursor: pointer !important;
+}
+
+#cy .node:hover {
+    cursor: pointer !important;
+}
+
+/* Ensure edges don't interfere with node interactions */
+#cy .edge {
+    pointer-events: none;
+}

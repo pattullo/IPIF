@@ -3,54 +3,89 @@ import { handleSearch, handleFilterChange } from './filters.js';
 import { setupLegend } from './legend.js';
 
 export function setupEventListeners(cy) {
+    if (!cy) {
+        console.error('Cytoscape instance not initialized');
+        return;
+    }
+
     console.log('Setting up event listeners...');
 
     // Set up legend
-    setupLegend();
-
-    // Remove all existing listeners
-    cy.removeAllListeners();
-
-    // Basic node tap handling
-    cy.$('node').on('tap', function(evt) {
-        console.log('Node tapped:', this.id());
-        showNodeModal(this);
-        evt.preventDefault();
-    });
-
-    // Search input
-    const searchInput = document.getElementById('search-input');
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => handleSearch(e.target.value, cy));
+    try {
+        setupLegend();
+    } catch (error) {
+        console.error('Error setting up legend:', error);
     }
 
-    // Filter changes
-    const domainFilter = document.getElementById('domain-filter');
-    const programFilter = document.getElementById('program-filter');
-    const providerFilter = document.getElementById('provider-filter');
-    
-    if (domainFilter) domainFilter.addEventListener('change', () => handleFilterChange(cy));
-    if (programFilter) programFilter.addEventListener('change', () => handleFilterChange(cy));
-    if (providerFilter) providerFilter.addEventListener('change', () => handleFilterChange(cy));
+    // Safe removal of existing listeners
+    try {
+        cy.off('*'); // Replace removeAllListeners with off('*')
+    } catch (error) {
+        console.error('Error removing existing listeners:', error);
+    }
 
-    // Window resize
+    // Node tap handling with error protection
+    try {
+        cy.on('tap', 'node', function(evt) {
+            console.log('Node tapped:', this.id());
+            showNodeModal(this);
+            evt.preventDefault();
+        });
+    } catch (error) {
+        console.error('Error setting up node tap listener:', error);
+    }
+
+    // Search input handling
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            try {
+                handleSearch(e.target.value, cy);
+            } catch (error) {
+                console.error('Error handling search:', error);
+            }
+        });
+    }
+
+    // Filter change handling with error protection
+    const setupFilter = (filterId) => {
+        const filter = document.getElementById(filterId);
+        if (filter) {
+            filter.addEventListener('change', () => {
+                try {
+                    handleFilterChange(cy);
+                } catch (error) {
+                    console.error(`Error handling ${filterId} change:`, error);
+                }
+            });
+        }
+    };
+
+    setupFilter('domain-filter');
+    setupFilter('program-filter');
+    setupFilter('provider-filter');
+
+    // Window resize handling with debounce
     let resizeTimer;
     window.addEventListener('resize', function() {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(function() {
             if (cy) {
-                cy.fit(50);
+                try {
+                    cy.fit(50);
+                } catch (error) {
+                    console.error('Error handling resize:', error);
+                }
             }
         }, 250);
     });
 
-    // Add CSS to container for cursor
+    // Cursor styling
     const container = document.getElementById('cy');
     if (container) {
         container.style.cursor = 'default';
     }
 
-    // Log setup completion
     console.log('Event listeners setup complete');
     console.log('Number of nodes:', cy.nodes().length);
 }
