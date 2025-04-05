@@ -17,6 +17,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.5/dagre.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.5.0/cytoscape-dagre.min.js"></script>
+    <script type="module" src="js/main.js"></script>
     <script type="module" src="./js/domains.js"></script>
 </head>
 <body>
@@ -100,6 +101,76 @@
             </div>
         </div>
 
+
+        <div id="detailModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close-button" id="closeDetailModal">&times;</span>
+                <h2 id="detailName">Node Name</h2>
+                <p><strong>ID:</strong> <span id="detailId"></span></p>
+                <p><strong>Type:</strong> <span id="detailType"></span></p>
+                <p><strong>Domain:</strong> <span id="detailDomain"></span></p>
+                <p><strong>Status:</strong> <span id="detailStatus"></span></p>
+                <p><strong>Completed:</strong> <span id="detailCompletionDate"></span></p>
+                <p><strong>Expires:</strong> <span id="detailExpiryDate"></span></p>
+                <p><strong>Provider:</strong> <span id="detailProvider"></span></p>
+                <p><strong>Programs:</strong> <span id="detailPrograms"></span></p>
+                <p><strong>Tags:</strong> <span id="detailTags"></span></p>
+                <p><strong>Notes:</strong></p>
+                <pre id="detailNotes"></pre> <button id="editNodeButton">Edit</button>
+            </div>
+        </div>
+
+        <div id="editModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close-button" id="closeEditModal">&times;</span>
+                <h2>Edit Item</h2>
+                <form id="editForm">
+                    <input type="hidden" id="editId"> <label for="editName">Name:</label><br>
+                    <input type="text" id="editName" name="name" required><br>
+        
+                    <label for="editType">Type:</label><br>
+                    <select id="editType" name="type">
+                        <option value="Certification">Certification</option>
+                        <option value="Course">Course</option>
+                        <option value="Module">Module</option>
+                        <option value="Skill">Skill</option>
+                        <option value="Milestone">Milestone</option>
+                        <option value="MaintenanceActivity">MaintenanceActivity</option>
+                    </select><br>
+        
+                    <label for="editDomain">Domain:</label><br>
+                    <input type="text" id="editDomain" name="domain"><br> <label for="editStatus">Status:</label><br>
+                    <select id="editStatus" name="status">
+                        <option value="Planned">Planned</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Expired">Expired</option>
+                    </select><br>
+        
+                    <label for="editCompletionDate">Completion Date:</label><br>
+                    <input type="date" id="editCompletionDate" name="completion_date"><br>
+        
+                    <label for="editExpiryDate">Expiry Date:</label><br>
+                    <input type="date" id="editExpiryDate" name="expiry_date"><br>
+        
+                    <label for="editProvider">Provider:</label><br>
+                    <input type="text" id="editProvider" name="provider"><br>
+        
+                    <label for="editPrograms">Programs (comma-separated):</label><br>
+                    <input type="text" id="editPrograms" name="programs"><br>
+        
+                    <label for="editTags">Tags (comma-separated):</label><br>
+                    <input type="text" id="editTags" name="tags"><br>
+        
+                    <label for="editNotes">Notes:</label><br>
+                    <textarea id="editNotes" name="notes" rows="4"></textarea><br>
+        
+                    <button type="submit">Save Changes</button>
+                    <button type="button" id="cancelEdit">Cancel</button>
+                </form>
+            </div>
+        </div>
+
         <!-- Node Modal -->
         <div id="node-modal" class="modal hidden panel">
             <div class="modal-content">
@@ -124,7 +195,6 @@
         </div>
     </div>
 
-    <!-- Main Script (using ES modules) -->
-    <script type="module" src="js/main.js"></script>
+
 </body>
 </html>

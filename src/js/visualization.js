@@ -1,211 +1,143 @@
-import { createTimeline } from './timeline.js';
-import { setupDomains } from './domains.js';
-import { cytoscapeConfig } from './config.js';
-import { showNodeModal } from './modal.js';
+// Import Cytoscape library (if using npm/modules)
+// import cytoscape from 'cytoscape';
+// Example layout extension import (if using npm/modules)
+// import dagre from 'cytoscape-dagre';
+// cytoscape.use(dagre); // Register extension before use
 
-// Data validation function
-function validateData(data) {
-    if (!data || !Array.isArray(data.learning_items)) {
-        throw new Error('Invalid data structure: learning_items array is required');
-    }
-
-    data.learning_items.forEach((item, index) => {
-        if (!item.id || !item.name || !item.domain) {
-            throw new Error(`Required fields missing in learning item at index ${index}`);
-        }
-    });
-
-    return true;
+// Helper function (can be inside or outside initializeVisualization scope)
+export function getLearningItemsFromElements(elements) {
+    // Filter out edges and map nodes back to their original data structure
+     if (!elements || typeof elements.nodes !== 'function') {
+         console.warn("getLearningItemsFromElements: Invalid elements object received.");
+         return [];
+     }
+    return elements.nodes().map(node => node.data());
 }
 
-export function initializeVisualization(data) {
-    console.log('Starting visualization initialization');
-    
+// Function to fetch and process learning data
+async function fetchData(url = './data/sample-data.json') { // <-- Corrected path HERE
     try {
-        // Validate input data
-        validateData(data);
-
-        // Create Cytoscape instance
-        const cy = cytoscape(cytoscapeConfig);
-        if (!cy) {
-            throw new Error('Failed to create Cytoscape instance');
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status} loading ${url}`);
         }
+        const data = await response.json();
+        console.log("Data fetched successfully:", data);
 
-        // Initialize components
-        try {
-            createTimeline(data);
-            setupDomains(data);
-        } catch (error) {
-            console.error('Error initializing components:', error);
-            throw new Error('Component initialization failed');
-        }
+        // --- Data Transformation (if needed) ---
+        if (data.learning_items && !data.elements) {
+            console.log("Transforming learning_items to elements array...");
+            const nodes = data.learning_items.map(item => ({ data: item }));
+            const edges = [];
 
-        // Create and add elements
-        const elements = createElements(data);
-        cy.add(elements);
-
-        // Apply layout
-        applyLayout(cy);
-        cy.fit(50);
-
-        // Set up event handlers
-        setupEventHandlers(cy);
-
-        return cy;
-    } catch (error) {
-        console.error('Error in initializeVisualization:', error);
-        // Notify the user of the error
-        document.getElementById('cy').innerHTML = `
-            <div class="error-message">
-                Failed to initialize visualization: ${error.message}
-            </div>`;
-        throw error;
-    }
-}
-
-function createElements(data) {
-    const elements = [];
-
-    try {
-        // Add nodes
-        data.learning_items.forEach(item => {
-            elements.push({
-                group: 'nodes',
-                data: {
-                    id: item.id,
-                    name: item.name,
-                    status: item.status || 'pending',
-                    type: item.type || 'default',
-                    domain: item.domain,
-                    completion_date: item.completion_date,
-                    expiry_date: item.expiry_date,
-                    url: item.url,
-                    provider: item.provider
+            nodes.forEach(node => {
+                // Prerequisites
+                if (node.data.prerequisites && Array.isArray(node.data.prerequisites)) {
+                    node.data.prerequisites.forEach(prereqId => {
+                        if (nodes.some(n => n.data.id === prereqId)) {
+                           edges.push({ data: { id: `edge-prereq-${prereqId}-${node.data.id}`, source: prereqId, target: node.data.id, type: 'prerequisite' } });
+                        } else { console.warn(`Prerequisite source node '${prereqId}' not found for target '${node.data.id}'.`); }
+                    });
+                }
+                // Maintenance Contributions
+                 if (node.data.maintenance_contribution_for && Array.isArray(node.data.maintenance_contribution_for)) {
+                    node.data.maintenance_contribution_for.forEach(targetCertId => {
+                        if (nodes.some(n => n.data.id === targetCertId)) {
+                            edges.push({ data: { id: `edge-maint-${node.data.id}-${targetCertId}`, source: node.data.id, target: targetCertId, type: 'maintenance' } });
+                        } else { console.warn(`Maintenance target node '${targetCertId}' not found for source '${node.data.id}'.`); }
+                    });
                 }
             });
-        });
+            return { nodes, edges }; // Return in Cytoscape elements format
+        } else if (data.elements && data.elements.nodes && data.elements.edges) {
+             console.log("Data is already in elements format.");
+            return data.elements;
+        } else if(Array.isArray(data) && data.length > 0 && data[0].group && (data[0].group === 'nodes' || data[0].group === 'edges')) {
+             console.log("Data appears to be a direct elements array.");
+             return data;
+         } else {
+             throw new Error("Invalid or unrecognized data format in JSON file. Expected 'learning_items' array or Cytoscape 'elements' structure.");
+         }
 
-        // Add edges
-        data.learning_items.forEach(item => {
-            if (Array.isArray(item.prerequisites)) {
-                item.prerequisites.forEach(prereq => {
-                    elements.push({
-                        group: 'edges',
-                        data: {
-                            id: `$${prereq}-$$ {item.id}`,
-                            source: prereq,
-                            target: item.id
-                        }
-                    });
-                });
-            }
-        });
-
-        return elements;
     } catch (error) {
-        console.error('Error creating elements:', error);
-        throw new Error('Failed to create visualization elements');
+        console.error("Could not fetch or process data:", error);
+        return { nodes: [], edges: [] };
     }
 }
 
-function setupEventHandlers(cy) {
-    const container = document.getElementById('cy');
+
+// Main function to initialize Cytoscape, exported for use in main.js
+export async function initializeVisualization(containerSelector) {
+    const container = document.querySelector(containerSelector);
     if (!container) {
-        throw new Error('Visualization container not found');
+        console.error(`Container element '${containerSelector}' not found.`);
+        return null;
     }
 
-    // Container click handler
-    container.addEventListener('click', (event) => {
-        const rect = container.getBoundingClientRect();
-        const position = {
-            x: event.clientX - rect.left,
-            y: event.clientY - rect.top
-        };
+    const graphElements = await fetchData(); // Uses corrected path internally
 
-        const clickedElements = cy.elementsAt(position);
-        const clickedNode = clickedElements.filter('node')[0];
-        
-        if (clickedNode) {
-            showNodeModal(clickedNode);
-        }
-    });
+    if (!graphElements || !Array.isArray(graphElements.nodes)) {
+        console.error("Failed to get valid graph data structure. Cannot initialize visualization.");
+         if(container) container.innerHTML = 'Error: Invalid data structure received.';
+        return null;
+    }
 
-    // Node-specific event handlers
-    cy.nodes().forEach(node => {
-        node.on('tap', function(evt) {
-            showNodeModal(this);
-            evt.preventDefault();
-        });
+     console.log(`Initializing Cytoscape in container '${containerSelector}'...`);
 
-        node.on('mouseover', function() {
-            this.style('border-width', '3px');
-            document.body.style.cursor = 'pointer';
-        });
-
-        node.on('mouseout', function() {
-            this.style('border-width', '2px');
-            document.body.style.cursor = 'default';
-        });
-    });
-}
-
-function applyLayout(cy) {
     try {
-        cy.reset();
+        const cy = cytoscape({
+            container: container,
+            elements: graphElements,
 
-        const domains = [...new Set(cy.nodes().map(node => node.data('domain')))];
-        const totalHeight = Math.max(domains.length * 200, 400); // Minimum height of 400px
+            // --- STYLING ---
+             style: [
+                 { selector: 'node', style: { 'background-color': '#888', 'label': 'data(name)', 'width': '80px', 'height': '80px', 'font-size': '10px', 'color': '#fff', 'text-outline-color': '#000', 'text-outline-width': 1, 'text-valign': 'bottom', 'text-halign': 'center', 'text-margin-y': '5px', 'text-wrap': 'wrap', 'text-max-width': '75px' }},
+                 { selector: 'node[status="Completed"]', style: { 'background-color': '#4CAF50' } },
+                 { selector: 'node[status="In Progress"]', style: { 'background-color': '#FFC107' } },
+                 { selector: 'node[status="Planned"]', style: { 'background-color': '#9E9E9E' } },
+                 { selector: 'node[status="Expired"]', style: { 'background-color': '#F44336', 'border-width': 2, 'border-color': '#000' } },
+                 { selector: 'node[type="Certification"]', style: { 'shape': 'hexagon' } },
+                 { selector: 'node[type="Course"]', style: { 'shape': 'rectangle' } },
+                 { selector: 'node[type="Milestone"]', style: { 'shape': 'star' } },
+                 { selector: 'node[type="MaintenanceActivity"]', style: { 'shape': 'diamond' } },
+                 { selector: 'node[type="Skill"]', style: { 'shape': 'round-tag' } },
+                 { selector: 'node[type="Module"]', style: { 'shape': 'round-rectangle' } },
+                 { selector: 'node:selected', style: {'border-width': 3, 'border-color': '#03A9F4'} },
+                 { selector: 'node.hover', style: {'background-color': '#03A9F4'} },
+                 { selector: '.updated', style: {'border-color': 'orange', 'border-width': 4} }, // For visual feedback on save
+                 { selector: 'edge', style: { 'width': 2, 'line-color': '#ccc', 'curve-style': 'bezier' } },
+                 { selector: 'edge[type="prerequisite"]', style: { 'line-color': '#999', 'target-arrow-shape': 'triangle', 'target-arrow-color': '#999', 'arrow-scale': 1.2 } },
+                 { selector: 'edge[type="maintenance"]', style: { 'line-color': '#2196F3', 'line-style': 'dotted', 'target-arrow-shape': 'triangle', 'target-arrow-color': '#2196F3', 'arrow-scale': 1.2 } },
+                 { selector: 'edge.highlighted', style: { 'line-color': '#FF5722', 'width': 4 } }
+             ],
 
-        cy.container().style.height = `${totalHeight}px`;
-
-        const layout = cy.layout({
-            name: 'dagre',
-            rankDir: 'LR',
-            align: 'DL',
-            spacingFactor: 1.2,
-            nodeDimensionsIncludeLabels: true,
-            rankSep: 75,
-            nodeSep: 40,
-            ranker: 'network-simplex',
-            fit: true,
-            padding: 50,
-            animate: false,
-            positions: function(node) {
-                const domain = node.data('domain');
-                const domainIndex = domains.indexOf(domain);
-                const bandHeight = 200;
-                return {
-                    y: (domainIndex * bandHeight) + (bandHeight / 2)
-                };
+            // --- LAYOUT ---
+            layout: {
+                name: 'dagre',
+                rankDir: 'LR',
+                spacingFactor: 1.3,
             }
         });
 
-        layout.run();
+        // --- Optional: Add basic interactions ---
+        cy.on('mouseover', 'node', (event) => event.target.addClass('hover'));
+        cy.on('mouseout', 'node', (event) => event.target.removeClass('hover'));
 
-        // Post-layout adjustments
-        setTimeout(() => {
-            adjustViewport(cy);
-        }, 100);
+        console.log("Cytoscape initialization complete.");
+
+        // Fit/center view after layout calculation
+         cy.ready(() => {
+            console.log("Graph ready, fitting view.");
+             cy.fit(null, 50);
+         });
+
+        cy.resize();
+
+        return { cy: cy }; // Return object containing the instance
 
     } catch (error) {
-        console.error('Error applying layout:', error);
-        throw new Error('Failed to apply visualization layout');
+        console.error("Error initializing Cytoscape:", error);
+        if (container) container.innerHTML = `Error initializing Cytoscape: ${error.message}`;
+        return null;
     }
-}
-
-function adjustViewport(cy) {
-    const bb = cy.elements().boundingBox();
-    const containerWidth = cy.width();
-    const widthZoom = (containerWidth / bb.w) * 0.9;
-    
-    cy.zoom({
-        level: Math.min(Math.max(widthZoom, 0.5), 2),
-        position: {
-            x: bb.x1 + bb.w/2,
-            y: bb.y1 + bb.h/2
-        }
-    });
-
-    document.querySelector('.visualization-container').scrollTop = 0;
-    cy.center();
 }
