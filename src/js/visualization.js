@@ -108,6 +108,14 @@ export async function initializeVisualization(containerSelector) {
         // Initial resize call
         cy.resize();
 
+
+        // Temporary zoom logger to catch ideal zoom level, rounded to 3 decimals
+        cy.on('zoom', function() {
+            console.log('Current zoom level:', cy.zoom().toFixed(3));
+        });
+
+        // ***** After initially looking at things, it appears around zoom: .800 is a good default for the initial view. *****      
+
         // Return object containing the cy instance
         return { cy: cy };
 
