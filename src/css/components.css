@@ -1,284 +1,344 @@
-/* Legend styles */
-.legend-icon {
-    width: 24px;
-    height: 24px;
-    opacity: 0.7;
-    transition: opacity 0.2s;
-}
+/* Appearance styles for specific UI components */
 
-.legend-icon:hover {
-    opacity: 1;
-}
-
-/* Panel styles (used by both legend and modals) */
-.panel {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
-
-#legend-panel {
-    position: fixed;
-    top: 70px;
-    right: 20px;
-    width: 250px;
-    z-index: 1000;
-}
-
-.legend-header {
-    padding: 0.75rem;
-    border-bottom: 1px solid #dee2e6;
+/* --- Filters --- */
+.filter-container {
     display: flex;
-    justify-content: space-between;
+    gap: 0.75rem;
     align-items: center;
 }
 
-.legend-content {
-    padding: 1rem;
-}
-
-.legend-section {
-    margin-bottom: 1rem;
-}
-
-.legend-section h4 {
-    margin-bottom: 0.5rem;
-    color: #495057;
-}
-
-.legend-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.25rem;
-}
-
-.legend-symbol {
-    width: 20px;
-    height: 20px;
-}
-
-.legend-symbol.hexagon {
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    background-color: #666;
-}
-
-.legend-symbol.circle {
-    border-radius: 50%;
-    background-color: #666;
-}
-
-.legend-symbol.completed {
-    background-color: #4CAF50;
-}
-
-.legend-symbol.in-progress {
-    background-color: #2196F3;
-}
-
-.legend-symbol.planned {
-    background-color: #9E9E9E;
-}
-
-/* Modal styles */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    width: 90%;
-    max-width: 500px;
-    max-height: 90vh;
-    overflow-y: auto;
-    background-color: white;
-    border-radius: 8px;
-}
-
-.modal-header {
-    padding: 1rem;
-    border-bottom: 1px solid #dee2e6;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.modal-controls {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.modal-controls button {
-    background: none;
-    border: none;
-    padding: 0.5rem;
-    cursor: pointer;
-    color: #6c757d;
-    transition: color 0.2s;
-}
-
-.modal-controls button:hover {
-    color: #495057;
-}
-
-.modal-body {
-    padding: 1rem;
-}
-
-.form-group {
-    margin-bottom: 1rem;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: #495057;
-    font-weight: 500;
-}
-
-.form-group input,
-.form-group select {
-    width: 100%;
-    padding: 0.375rem 0.75rem;
+.compact-filter {
+    padding: 0.375rem 1.75rem 0.375rem 0.75rem; /* Adjust padding */
     font-size: 0.9rem;
     border: 1px solid #ced4da;
     border-radius: 4px;
+    background: white url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/></svg>") no-repeat right 0.5rem center/12px 12px;
+    appearance: none;
+    -webkit-appearance: none; /* For Safari */
+    min-width: 140px; /* Adjust width */
+    color: #495057;
+    line-height: 1.4; /* Ensure text fits */
+}
+.compact-filter:hover {
+    border-color: #adb5bd;
+}
+.compact-filter:focus {
+    border-color: #86b7fe;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
 }
 
-.form-buttons {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: flex-end;
-    margin-top: 1rem;
-}
 
-.form-buttons button {
-    padding: 0.375rem 0.75rem;
-    border-radius: 4px;
-    border: 1px solid #ced4da;
-    background-color: white;
-    cursor: pointer;
-}
+/* --- Legend Components --- */
 
-.form-buttons button[type="submit"] {
-    background-color: #0d6efd;
-    color: white;
-    border-color: #0d6efd;
-}
-
-.form-buttons button.cancel {
-    color: #6c757d;
-}
-
-.form-buttons button:hover {
-    opacity: 0.9;
-}
-
-/* Cursor styles */
-#cy {
-    width: 100%;
-    height: 100%;
-    display: block;
-    position: absolute; /* Or relative if container isn't positioned */
-    top: 0;
-    left: 0;
-    z-index: 1; /* Below legend */
-    cursor: default;
-}
-
-#cy .node {
-    cursor: pointer !important;
-}
-
-#cy .node:hover {
-    cursor: pointer !important;
-}
-
-/* Ensure edges don't interfere with node interactions */
-#cy .edge {
-    pointer-events: none;
-}
-
-/* Basic Modal Styling (Adapt as needed) */
-.modal {
-    position: fixed; z-index: 100; left: 0; top: 0;
-    width: 100%; height: 100%; overflow: auto;
-    background-color: rgba(0,0,0,0.4);
-}
-.modal-content {
-    background-color: #fefefe; margin: 15% auto; padding: 20px;
-    border: 1px solid #888; width: 80%; max-width: 600px;
-}
-.close-button {
-    color: #aaa; float: right; font-size: 28px; font-weight: bold;
-}
-.close-button:hover, .close-button:focus {
-    color: black; text-decoration: none; cursor: pointer;
-}
-
-/* temporarily until we implement a backend DB */
-#editNodeButton {
-    display: none; /* Hide the edit button */
-}
-
-#visualizationContainer {
-    position: relative;
-    /* Make sure it occupies space */
-    width: 100%;
-    height: 80vh; /* Example height */
-    border: 1px solid #eee; /* Optional: visualize boundary */
-}
-
-/* Wrapper for legend button AND content */
-#legendWrapper {
-    position: absolute; /* Positioned relative to #visualizationContainer */
-    top: 10px;          /* Space from top of visualization container */
-    right: 10px;         /* Space from right of visualization container */
-    z-index: 100;        /* Above the #cy canvas */
-    display: flex;       /* Use flexbox to manage button/content layout */
-    flex-direction: column; /* Stack button above content */
-    align-items: flex-end;  /* Align items to the right edge */
-}
-
+/* Legend Toggle Button */
 #legend-toggle {
-    /* Style the button */
     background: #fff;
     border: 1px solid #ccc;
     border-radius: 4px;
     padding: 4px;
     cursor: pointer;
     box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
-    margin-bottom: 4px; /* Space below button */
-    line-height: 0; /* Prevent extra space around SVG/img */
+    margin-bottom: 4px;
+    line-height: 0;
+    transition: background-color 0.2s;
 }
 #legend-toggle:hover {
     background: #f0f0f0;
 }
-
-/* The hidden/shown legend content box */
-#legendContent {
-    width: 200px; /* Adjust width */
-    background-color: rgba(255, 255, 255, 0.9);
-    border: 1px solid #aaa;
-    padding: 10px 15px;
-    border-radius: 5px;
-    box-shadow: 2px 2px 6px rgba(0,0,0,0.15);
-    /* Add text styles, etc. */
+.legend-icon { /* Icon inside button */
+    width: 20px; /* Adjust size */
+    height: 20px;
+    vertical-align: middle;
 }
 
-.legend-color-box { /* Simple colored square for legend */
+/* Legend Content Box */
+#legendContent {
+    width: 220px; /* Adjust width */
+    background-color: rgba(255, 255, 255, 0.92); /* Slightly more opaque */
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.15);
+}
+/* Padding/Structure inside the legend content */
+#legendContent .legend-content-body {
+     padding: 12px 15px;
+}
+#legendContent h4 {
+    margin-top: 0; /* Remove default margin */
+    margin-bottom: 0.6rem;
+    font-size: 1rem;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.3rem;
+}
+#legendContent .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.4rem;
+    font-size: 0.85rem; /* Slightly smaller legend text */
+    color: #444;
+}
+#legendContent .legend-item:last-child {
+    margin-bottom: 0;
+}
+/* Color squares */
+#legendContent .legend-color-box {
     display: inline-block;
-    width: 12px;
-    height: 12px;
-    margin-right: 5px;
-    border: 1px solid #ddd;
+    width: 13px;
+    height: 13px;
+    margin-right: 6px;
+    border: 1px solid #bbb;
     vertical-align: middle;
+    flex-shrink: 0;
+}
+/* Shape symbols (using unicode or pseudo-elements) */
+#legendContent .legend-shape-symbol {
+    display: inline-block;
+    width: 16px; /* Width for alignment */
+    text-align: center;
+    margin-right: 6px;
+    color: #666;
+    font-size: 1.1em;
+    font-family: "Segoe UI Symbol", sans-serif; /* Ensure symbols render */
+}
+/* Edge symbols */
+#legendContent .legend-edge-solid { font-weight: bold; color: #999; }
+#legendContent .legend-edge-dotted { letter-spacing: 1px; color: #2196F3; font-weight: bold; }
+
+
+/* --- Modal Components --- */
+
+/* Modal overlay */
+.modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    /* Ensure Flexbox centering properties are present */
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center;    /* Center vertically */
+    z-index: 1050;
+    overflow: hidden; /* Should be okay, modal body handles scroll */
+    /* display: none; is handled by JS */
+}
+
+/* Modal content box */
+.modal-content {
+    background-color: #fff;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    width: 90%;
+    max-width: 550px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Content box uses internal scroll */
+    margin: 0; /* --- REMOVE any 'margin: auto' or specific margins --- */
+}
+
+/* Modal header */
+.modal-header {
+    padding: 0.8rem 1.2rem;
+    border-bottom: 1px solid #e9ecef; /* Lighter border */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.15rem; /* Adjusted size */
+    font-weight: 600;
+}
+
+/* Close button */
+.close-button {
+    color: #6c757d; /* Grey color */
+    font-size: 1.8rem; /* Adjusted size */
+    font-weight: bold;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0 0.2rem;
+    line-height: 1;
+    opacity: 0.7;
+}
+.close-button:hover {
+    color: #000;
+    opacity: 1;
+}
+
+/* Modal body (scrollable part) */
+.modal-body {
+    padding: 1.2rem;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+/* Styling for <pre> tag in detail modal */
+#detailNotes {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9em;
+    white-space: pre-wrap; /* Allow wrapping */
+    word-wrap: break-word; /* Break long words */
+    max-height: 150px; /* Limit height if needed */
+    overflow-y: auto;
+}
+
+/* Form group styling */
+.form-group {
+    margin-bottom: 1rem;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 0.4rem;
+    color: #495057;
+    font-weight: 500;
+    font-size: 0.85rem; /* Smaller label */
+}
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.4rem 0.7rem; /* Adjusted padding */
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: #212529;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #86b7fe;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+.form-group textarea {
+    resize: vertical;
+    min-height: 60px; /* Minimum textarea height */
+}
+
+/* Modal footer/button area */
+.form-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    padding: 0.8rem 1.2rem;
+    border-top: 1px solid #e9ecef;
+    background-color: #f8f9fa;
+    flex-shrink: 0;
+}
+.form-buttons button {
+    padding: 0.4rem 0.8rem; /* Adjusted button padding */
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.form-buttons button[type="submit"] {
+    background-color: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+}
+.form-buttons button#cancelEdit {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    border-color: #ced4da;
+}
+.form-buttons button#cancelEdit:hover {
+     background-color: #e2e6ea;
+     border-color: #adb5bd;
+}
+.form-buttons button:hover {
+    opacity: 0.85;
+}
+
+/* --- Temporarily hide edit button --- */
+#editNodeButton {
+    display: none;
+}
+
+/* Detail Modal Specific Formatting */
+#detailModal .modal-body {
+    line-height: 1.6; /* Improve readability */
+}
+
+.detail-item {
+    display: flex; /* Use flexbox for alignment */
+    margin-bottom: 0.5rem; /* Space between items */
+    align-items: baseline; /* Align text baselines */
+}
+
+.detail-label {
+    font-weight: 600; /* Bold labels */
+    color: #333;
+    min-width: 100px;  /* <<< ADJUST Minimum width for labels - ensures alignment */
+    margin-right: 10px;
+    flex-shrink: 0; /* Prevent label from shrinking */
+}
+
+/* Notes section specific */
+.detail-item-notes {
+    /* Styles for the notes wrapper div if needed, like margin-top */
+    margin-top: 0.5rem;
+}
+.detail-item-notes strong { /* Style the "Notes:" label */
+    display: block; /* Make label appear on its own line */
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+    color: #333;
+}
+
+#detailNotes { /* Existing styles for the <pre> box */
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9em;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    max-height: 150px;
+    overflow-y: auto;
+    margin-top: 0; /* Remove extra top margin if needed */
+}
+
+/* Filter Reset Button Style */
+button#reset-filters-btn {
+    background: none;
+    border: 1px solid transparent; /* No border initially */
+    padding: 4px; /* Adjust padding to align vertically */
+    margin-left: 5px; /* Space from last filter */
+    cursor: pointer;
+    line-height: 0; /* Prevent extra space around icon */
+    color: #6c757d; /* Icon color */
+    opacity: 0.7;
+    transition: opacity 0.2s, border-color 0.2s;
+}
+button#reset-filters-btn:hover {
+    opacity: 1;
+    border-color: #ccc; /* Subtle border on hover */
+    background-color: #f8f8f8; /* Slight background on hover */
+}
+button#reset-filters-btn svg { /* Style the icon inside */
+    vertical-align: middle;
+}
+
+/* Filter Label Style */
+.filter-label {
+    font-weight: 500; /* Slightly less bold maybe */
+    color: #555;
+    margin-right: 10px; /* Space between label and first filter */
+    font-size: 0.9em;
+    white-space: nowrap; /* Prevent wrapping */
 }

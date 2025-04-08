@@ -1,4 +1,4 @@
-/* Main stylesheet - imports all component styles */
+/* Main stylesheet - imports all other stylesheets */
 @import 'base.css';
 @import 'layout.css';
 @import 'components.css';

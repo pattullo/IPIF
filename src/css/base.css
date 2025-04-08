@@ -1,14 +1,23 @@
-/* Base styles, resets, and typography */
+/* Base styles, resets, and global typography */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-html, body {
-    height: 100%;
+html {
+    height: 100%; /* Ensure html takes full height */
+}
+
+body {
+    height: 100%; /* Ensure body takes full height */
     width: 100%;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue";
+    font-size: 16px;
+    line-height: 1.5;
+    color: #333;
+    background-color: #fff;
+    overflow: hidden; /* Prevent body scrollbars, scrolling handled internally */
 }
 
 #app {
@@ -22,12 +31,7 @@ html, body {
     display: none !important;
 }
 
-.node-link {
-    color: #0066cc;
-    text-decoration: underline;
-    cursor: pointer;
-}
-
-.node-link:hover {
-    color: #003366;
+/* Remove default button padding/border if needed */
+button {
+    font-family: inherit;
 }

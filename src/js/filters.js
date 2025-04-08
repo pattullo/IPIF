@@ -6,10 +6,9 @@ let masterLearningData = [];
 let domainFilterSelect = null;
 let programFilterSelect = null;
 let providerFilterSelect = null;
-// let statusFilterSelect = null; // Add if you implement status filter
+let resetFiltersButton = null;
 
 // --- Helper Functions to Extract Unique Filter Options ---
-
 function getUniqueValues(items, property) {
     if (!Array.isArray(items)) return [];
     return [...new Set(items.map(item => item ? item[property] : undefined))] // Handle potential undefined items gracefully
@@ -112,7 +111,6 @@ function applyFilters() {
 
 
 // --- Exported Setup Function (Called from main.js) ---
-
 export function setupFilters(cy, learningDataArray) {
     if (!cy || !Array.isArray(learningDataArray)) {
         console.error("setupFilters requires a valid Cytoscape instance and data array.");
@@ -127,13 +125,14 @@ export function setupFilters(cy, learningDataArray) {
     domainFilterSelect = document.getElementById('domain-filter');
     programFilterSelect = document.getElementById('program-filter');
     providerFilterSelect = document.getElementById('provider-filter');
-    // statusFilterSelect = document.getElementById('status-filter');
+
+    // --- Get reference to reset button ---
+    resetFiltersButton = document.getElementById('reset-filters-btn');
 
     // Populate dropdowns initially
     populateDropdown(domainFilterSelect, getUniqueValues(masterLearningData, 'domain'), "All Domains");
     populateDropdown(programFilterSelect, getUniquePrograms(masterLearningData), "All Programs");
     populateDropdown(providerFilterSelect, getUniqueValues(masterLearningData, 'provider'), "All Providers");
-    // populateDropdown(statusFilterSelect, getUniqueValues(masterLearningData, 'status'), "All Statuses");
 
     // Add event listeners to trigger filtering
     const filterElements = [domainFilterSelect, programFilterSelect, providerFilterSelect /*, statusFilterSelect*/];
@@ -146,6 +145,23 @@ export function setupFilters(cy, learningDataArray) {
             console.warn("A filter select element was not found during listener setup.");
         }
     });
+
+// --- Add event listener for reset button ---
+    if (resetFiltersButton) {
+        resetFiltersButton.addEventListener('click', () => {
+            console.log("Reset filters button clicked.");
+            // Reset all select dropdowns to their first option ("All")
+            [domainFilterSelect, programFilterSelect, providerFilterSelect /*, statusFilterSelect*/]
+                .forEach(select => {
+                    if (select) select.value = ""; // Set value to empty string for "All" option
+                });
+            // Re-apply filters (which will now show everything)
+            applyFilters();
+        });
+         console.log("Reset filters listener added.");
+    } else {
+        console.warn("Reset filters button not found.");
+    }
 
     console.log("Filter setup complete.");
 }
