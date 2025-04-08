@@ -1,105 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IPIF</title>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>IPIF Visualizer</title>
     
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+        <link rel="icon" href="favicon.svg" type="image/svg+xml">
+        <link rel="alternate icon" href="favicon.png" type="image/png">
     
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+        <link rel="stylesheet" href="css/components.css">
+        <link rel="stylesheet" href="css/style.css">
     
-    <!-- Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.5/dagre.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.5.0/cytoscape-dagre.min.js"></script>
-    <script type="module" src="js/main.js"></script>
-    <script type="module" src="./js/domains.js"></script>
-</head>
-<body>
-    <div id="app">
+        <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+        <script src="https://unpkg.com/dagre@0.8.5/dist/dagre.min.js"></script>
+        <script src="https://unpkg.com/cytoscape-dagre@2.5.0/cytoscape-dagre.js"></script>
+    </head>
+    <body>
+
         <header>
             <div class="header-left">
-                <h1>IPIF - Iter praeteritum, Iter Futurum (The path past, the path ahead)</h1>
+                <h1>IPIF Visualizer</h1>
             </div>
             <div class="header-center">
                 <div class="filter-container">
-                    <select id="domain-filter" class="compact-filter" aria-label="Filter by Domain">
-                        <option value="all">All Domains</option>
-                    </select>
-                    <select id="program-filter" class="compact-filter" aria-label="Filter by Program">
-                        <option value="all">All Programs</option>
-                    </select>
-                    <select id="provider-filter" class="compact-filter" aria-label="Filter by Provider">
-                        <option value="all">All Providers</option>
-                    </select>
-                    <div class="search-group">
-                        <input type="text" id="search-input" placeholder="Search...">
-                        <i class="fas fa-search"></i>
+                    <select id="domain-filter">
+                        <option value="">All Domains</option>
+                        </select>
+                    <select id="program-filter">
+                        <option value="">All Programs</option>
+                        </select>
+                    <select id="provider-filter">
+                        <option value="">All Providers</option>
+                        </select>
                     </div>
-                </div>
             </div>
             <div class="header-right">
-                <button id="legend-toggle" title="Show/Hide Legend">
-                    <img src="map-legend.svg" alt="Legend" class="legend-icon">
-                </button>
-            </div>
+                </div>
         </header>
 
-        <div id="error-container" class="error-container" style="display: none;">
-            <div class="error-message"></div>
-            <button class="error-close"><i class="fas fa-xmark"></i></button>
-        </div>
-        
-        <div id="timeline">
-            <!-- Timeline will be dynamically generated -->
-        </div>
+        <main>
+            <div id="visualizationContainer" style="position: relative; height: calc(100vh - 60px); width: 100%;">
+                <div id="cy"></div> <div id="legendWrapper" class="graph-legend-wrapper">
+                    <button id="legend-toggle" title="Show/Hide Legend">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor" class="legend-icon"><path d="M3 11h8V3H3v8zm0 10h8v-8H3v8zm10 0h8v-8h-8v8zm0-18v8h8V3h-8z"></path></svg>
+                        </button>
+                    <div id="legendContent" class="graph-legend-content" style="display: none;">
+                        <h4>Legend</h4>
+                        <h5>Status</h5>
+                        <p><span class="legend-color-box" style="background-color: #4CAF50;"></span> Completed</p>
+                        <p><span class="legend-color-box" style="background-color: #FFC107;"></span> In Progress</p>
+                        <p><span class="legend-color-box" style="background-color: #9E9E9E;"></span> Planned</p>
+                        <p><span class="legend-color-box" style="background-color: #F44336; border: 1px solid black;"></span> Expired</p>
+                        <h5>Type</h5>
+                        <p><span class="legend-shape-hexagon"></span> Certification</p>
+                        <p><span class="legend-shape-rectangle"></span> Course</p>
+                        <p><span class="legend-shape-star"></span> Milestone</p>
+                        <p><span class="legend-shape-diamond"></span> Maintenance</p>
+                        <h5>Edges</h5>
+                        <p><span class="legend-edge-solid">──</span> Prerequisite</p>
+                        <p><span class="legend-edge-dotted">‑‑‑</span> Maintenance</p>
 
-        <div class="main-container">
-            <div class="visualization-container">
-                <div id="cy"></div>
-            </div>
-        </div>
-
-        <!-- Legend Panel -->
-        <div id="legend-panel" class="hidden panel">
-            <div class="legend-header">
-                <h3>Legend</h3>
-                <button id="legend-close"><i class="fas fa-xmark"></i></button>
-            </div>
-            <div class="legend-content">
-                <div class="legend-section">
-                    <h4>Node Types</h4>
-                    <div class="legend-item">
-                        <div class="legend-symbol hexagon"></div>
-                        <span>Certification</span>
                     </div>
-                    <div class="legend-item">
-                        <div class="legend-symbol circle"></div>
-                        <span>Course/Training</span>
-                    </div>
-                </div>
-                <div class="legend-section">
-                    <h4>Status</h4>
-                    <div class="legend-item">
-                        <div class="legend-symbol completed"></div>
-                        <span>Completed</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-symbol in-progress"></div>
-                        <span>In Progress</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-symbol planned"></div>
-                        <span>Planned</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+                </div> </div> </main>
 
 
         <div id="detailModal" class="modal" style="display: none;">
@@ -116,8 +78,8 @@
                 <p><strong>Programs:</strong> <span id="detailPrograms"></span></p>
                 <p><strong>Tags:</strong> <span id="detailTags"></span></p>
                 <p><strong>Notes:</strong></p>
-                <pre id="detailNotes"></pre> <button id="editNodeButton">Edit</button>
-            </div>
+                <pre id="detailNotes"></pre>
+                <button id="editNodeButton" style="display: none;">Edit</button> </div>
         </div>
 
         <div id="editModal" class="modal" style="display: none;">
@@ -125,9 +87,11 @@
                 <span class="close-button" id="closeEditModal">&times;</span>
                 <h2>Edit Item</h2>
                 <form id="editForm">
-                    <input type="hidden" id="editId"> <label for="editName">Name:</label><br>
+                    <input type="hidden" id="editId">
+
+                    <label for="editName">Name:</label><br>
                     <input type="text" id="editName" name="name" required><br>
-        
+
                     <label for="editType">Type:</label><br>
                     <select id="editType" name="type">
                         <option value="Certification">Certification</option>
@@ -137,64 +101,43 @@
                         <option value="Milestone">Milestone</option>
                         <option value="MaintenanceActivity">MaintenanceActivity</option>
                     </select><br>
-        
+
                     <label for="editDomain">Domain:</label><br>
-                    <input type="text" id="editDomain" name="domain"><br> <label for="editStatus">Status:</label><br>
+                    <input type="text" id="editDomain" name="domain"><br>
+
+                    <label for="editStatus">Status:</label><br>
                     <select id="editStatus" name="status">
                         <option value="Planned">Planned</option>
                         <option value="In Progress">In Progress</option>
                         <option value="Completed">Completed</option>
                         <option value="Expired">Expired</option>
                     </select><br>
-        
+
                     <label for="editCompletionDate">Completion Date:</label><br>
                     <input type="date" id="editCompletionDate" name="completion_date"><br>
-        
+
                     <label for="editExpiryDate">Expiry Date:</label><br>
                     <input type="date" id="editExpiryDate" name="expiry_date"><br>
-        
+
                     <label for="editProvider">Provider:</label><br>
                     <input type="text" id="editProvider" name="provider"><br>
-        
+
                     <label for="editPrograms">Programs (comma-separated):</label><br>
                     <input type="text" id="editPrograms" name="programs"><br>
-        
+
                     <label for="editTags">Tags (comma-separated):</label><br>
                     <input type="text" id="editTags" name="tags"><br>
-        
+
                     <label for="editNotes">Notes:</label><br>
                     <textarea id="editNotes" name="notes" rows="4"></textarea><br>
-        
+
                     <button type="submit">Save Changes</button>
                     <button type="button" id="cancelEdit">Cancel</button>
                 </form>
             </div>
         </div>
 
-        <!-- Node Modal -->
-        <div id="node-modal" class="modal hidden panel">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 id="modal-title"></h2>
-                    <div class="modal-controls">
-                        <button id="modal-edit" class="edit-button" title="Edit">
-                            <i class="fas fa-pencil"></i>
-                        </button>
-                        <button id="modal-close" class="close-button" title="Close">
-                            <i class="fas fa-xmark"></i>
-                        </button>
-                    </div>
-                </div>
-                <div id="modal-view-content" class="modal-body">
-                    <!-- View content will be dynamically generated -->
-                </div>
-                <div id="modal-edit-content" class="modal-body hidden">
-                    <!-- Edit form will be dynamically generated -->
-                </div>
-            </div>
-        </div>
-    </div>
+        <script type="module" src="js/main.js"></script>
 
-
-</body>
+    </body>
 </html>
