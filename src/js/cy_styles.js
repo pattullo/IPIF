@@ -1,18 +1,59 @@
 // Defines the visual style for the Cytoscape graph elements
 
 export const ipifStyles = [
-    // Default CHILD node style
-    { selector: 'node[!isParent]', style: { 'background-color': '#888', 'label': 'data(name)', 'width': '60px', 'height': '60px', 'font-size': '9px', 'color': '#fff', 'text-outline-color': '#000', 'text-outline-width': 1, 'text-valign': 'bottom', 'text-halign': 'center', 'text-margin-y': '3px', 'text-wrap': 'wrap', 'text-max-width': '55px', 'z-compound-depth': 'top', 'cursor': 'pointer' /* Added cursor here */ }},
-    // PARENT Node Styles (Domain Lanes)
-    { selector: 'node:parent', style: { 'label': 'data(name)', 'background-opacity': 0.15, 'border-width': 1, 'border-color': '#ccc', 'shape': 'rectangle', 'font-size': '16px', 'font-weight': 'bold', 'color': '#555', 'text-halign': 'left', 'text-valign': 'center', 'text-margin-x': '15px', 'padding': '30px', 'z-compound-depth': 'bottom' }},
+    // Default CHILD node style (Label styles MODIFIED)
+    {
+        selector: 'node[!isParent]',
+        style: {
+            'background-color': '#888',
+            'label': 'data(name)',
+            'width': '60px',
+            'height': '60px',
+            // --- Label Font Changes ---
+            'font-size': '14px',        // Increased size (adjust 10px-12px as needed)
+            'font-weight': 'normal',    // Normal weight
+            'color': '#333',            // Dark text color for readability
+            // text-outline-color: '#000', // REMOVED outline/shadow
+            // text-outline-width: 1,     // REMOVED outline/shadow
+            // --- End Label Font Changes ---
+            'text-valign': 'bottom',
+            'text-halign': 'center',
+            'text-margin-y': '4px',     // Adjusted margin
+            'text-wrap': 'wrap',
+            'text-max-width': '60px',   // Adjusted wrap width
+            'z-compound-depth': 'top',
+            'cursor': 'pointer'         // Added cursor style here
+        }
+    },
+    // PARENT Node Styles (Domain Lanes) (Label styles MODIFIED)
+    {
+        selector: 'node:parent',
+        style: {
+            'label': 'data(name)',
+            'background-opacity': 0.15,
+            'border-width': 1,
+            'border-color': '#ccc',
+            'shape': 'rectangle',
+            // --- Font Changes ---
+            'font-size': '24px',        // Increased size (adjust 18px-22px as needed)
+            'font-weight': 'bold',
+            'color': '#444',            // Darker grey label
+            // --- End Font Changes ---
+            'text-halign': 'left',
+            'text-valign': 'center',
+            'text-margin-x': '15px',    // Indent from left edge
+            'padding': '30px',          // Internal padding for children
+            'z-compound-depth': 'bottom'
+        }
+    },
     // Alternating background colors for domain lanes
-    { selector: 'node:parent.domain-even', style: { 'background-color': '#e9f5ff' } }, // Light blue-ish
-    { selector: 'node:parent.domain-odd', style: { 'background-color': '#f5f5f5' } }, // Light grey-ish
+    { selector: 'node:parent.domain-even', style: { 'background-color': '#e9f5ff' } },
+    { selector: 'node:parent.domain-odd', style: { 'background-color': '#f5f5f5' } },
     // Child Status-based styling
-    { selector: 'node[!isParent][status="Completed"]', style: { 'background-color': '#4CAF50' } }, // Green
-    { selector: 'node[!isParent][status="In Progress"]', style: { 'background-color': '#FFC107' } }, // Amber
-    { selector: 'node[!isParent][status="Planned"]', style: { 'background-color': '#9E9E9E' } }, // Grey
-    { selector: 'node[!isParent][status="Expired"]', style: { 'background-color': '#F44336', 'border-width': 2, 'border-color': '#000' } }, // Red
+    { selector: 'node[!isParent][status="Completed"]', style: { 'background-color': '#4CAF50' } },
+    { selector: 'node[!isParent][status="In Progress"]', style: { 'background-color': '#FFC107' } },
+    { selector: 'node[!isParent][status="Planned"]', style: { 'background-color': '#9E9E9E' } },
+    { selector: 'node[!isParent][status="Expired"]', style: { 'background-color': '#F44336', 'border-width': 2, 'border-color': '#000' } },
     // Child Type-based styling
     { selector: 'node[!isParent][type="Certification"]', style: { 'shape': 'hexagon' } },
     { selector: 'node[!isParent][type="Course"]', style: { 'shape': 'rectangle' } },

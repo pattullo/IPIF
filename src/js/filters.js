@@ -42,7 +42,6 @@ function populateDropdown(selectElement, optionsArray, defaultLabel = "All") {
 }
 
 // --- Function to Apply Filters to the Graph ---
-
 function applyFilters() {
     if (!cyInstance) {
         console.error("Cannot apply filters: cyInstance is not available.");
@@ -53,17 +52,17 @@ function applyFilters() {
     const selectedDomain = domainFilterSelect?.value || "";
     const selectedProgram = programFilterSelect?.value || "";
     const selectedProvider = providerFilterSelect?.value || "";
-    // const selectedStatus = statusFilterSelect?.value || "";
+    // const selectedStatus = statusFilterSelect?.value || ""; // Add if implemented
 
     console.log(`Applying filters - Domain: '${selectedDomain}', Program: '${selectedProgram}', Provider: '${selectedProvider}'`);
 
     // Use batch operations for performance
     cyInstance.batch(() => {
+        // --- Determine which elements MATCH the filter ---
+
         // Filter CHILD nodes based on selections
-        const visibleChildNodes = cyInstance.nodes().filter(node => {
-            // Important: Skip nodes that are already filtered out by other means if necessary
-            // if (node.removed()) return false; // Check if node was removed, skip if so
-            if (node.isParent()) return false; // Ignore parent nodes in this filter
+        const matchingChildNodes = cyInstance.nodes().filter(node => {
+            if (node.isParent()) return false; // Ignore parent nodes directly
 
             const data = node.data();
             if (!data) return false; // Skip if node has no data
@@ -72,42 +71,43 @@ function applyFilters() {
             let providerMatch = selectedProvider === "" || data.provider === selectedProvider;
             // let statusMatch = selectedStatus === "" || data.status === selectedStatus;
 
-            // Program match: check if the programs array contains the selected program
+            // Program match
             let programMatch = selectedProgram === "" || (Array.isArray(data.programs) && data.programs.includes(selectedProgram));
 
             return domainMatch && programMatch && providerMatch /* && statusMatch */;
         });
 
-        // Determine which parent nodes need to be visible
-        const parentsOfVisibleChildren = visibleChildNodes.parents();
+        // Get the parents of the matching child nodes
+        const parentsOfMatchingChildren = matchingChildNodes.parents();
 
-        // Combine visible children and their necessary parents
-        const elementsToShow = visibleChildNodes.union(parentsOfVisibleChildren);
+        // Combine matching children and their necessary parents
+        const nodesToShow = matchingChildNodes.union(parentsOfMatchingChildren);
 
-        // Hide ALL elements first (nodes and edges)
-        cyInstance.elements().style('display', 'none');
+        // Get edges connecting the nodes that should be fully visible
+        const edgesToShow = nodesToShow.edgesWith(nodesToShow);
 
-        // Show the filtered nodes, their parents, and the edges connecting them
-        // Important: Ensure compound parent visibility settings allow children to show through
-        elementsToShow.style('display', 'element');
-        // Show edges that connect nodes WITHIN the visible set
-        elementsToShow.edgesWith(elementsToShow).style('display', 'element');
+        // Combine all elements that should NOT be faded
+        const elementsToShow = nodesToShow.union(edgesToShow);
+
+        // --- Apply Fading using Classes ---
+
+        // 1. Get all relevant elements (nodes and edges)
+        const allElements = cyInstance.elements(); // Or cyInstance.nodes().union(cyInstance.edges());
+
+        // 2. Add 'filtered-out' class to ALL elements first
+        allElements.addClass('filtered-out');
+
+        // 3. Remove 'filtered-out' class from the elements that should be visible
+        elementsToShow.removeClass('filtered-out');
 
     }); // End batch
 
-    console.log(`Filter applied. Visible child nodes: ${visibleChildNodes.length}`);
+    console.log(`Filter applied (opacity). Matching child nodes: ${matchingChildNodes.length}`);
 
-    // Optional: Re-run layout on visible elements. Use with caution.
-    /*
-    const visibleEles = cyInstance.elements(':visible');
-    if (visibleEles.length > 0 && visibleEles.length < cyInstance.elements().length) { // Avoid re-layout if everything is visible
-        console.log("Running layout on visible elements...");
-        cyInstance.layout({
-            name: 'dagre', rankDir: 'LR', fit: false, eles: visibleEles
-        }).run();
-    }
-    */
-}
+    // Note: Re-running layout after opacity changes is generally NOT needed or desired.
+    // Consider F6 (Auto-fit/Center View on Filter Apply) separately if needed.
+
+} // End applyFilters
 
 
 // --- Exported Setup Function (Called from main.js) ---

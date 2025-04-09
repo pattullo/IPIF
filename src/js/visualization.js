@@ -36,7 +36,7 @@ export async function initializeVisualization(containerSelector) {
     // Validate processed data
     if (!Array.isArray(graphElements)) {
         console.error("Failed to get valid graph elements array from data loader.");
-         if(container) container.innerHTML = 'Error: Invalid data structure loaded.';
+        if (container) container.innerHTML = 'Error: Invalid data structure loaded.';
         return null;
     }
 
@@ -62,7 +62,7 @@ export async function initializeVisualization(containerSelector) {
         console.log("Cytoscape core initialization complete.");
 
         // --- Adjust Initial View using cy.ready() ---
-        cy.ready(function() {
+        cy.ready(function () {
             console.log("cy.ready() called. Adjusting initial view...");
             // Using setTimeout to ensure layout calculations are likely finished
             setTimeout(() => {
@@ -78,21 +78,21 @@ export async function initializeVisualization(containerSelector) {
 
                 if (bb.w === 0 || bb.h === 0) { /* ... error handling ... */ cy.center(); return; }
 
-                const viewportHeight = cy.height();
-                const availableHeight = viewportHeight - padding.top - padding.bottom;
-
-                if (availableHeight <= 0 || bb.h <= 0) { /* ... error handling ... */ cy.center(); return; }
-
-                const targetZoomY = availableHeight / bb.h;
-                const targetZoom = Math.max(0.1, Math.min(1.5, targetZoomY));
-                console.log(`Calculated Zoom (targetZoom): ${targetZoom.toFixed(3)}`);
+                // --- Set Fixed Target Zoom ---
+                const targetZoom = 0.8;
+                console.log(`Using Fixed Zoom (targetZoom): ${targetZoom.toFixed(3)}`);
 
                 // Calculate pan based on model coordinates and target zoom
+                const viewportHeight = cy.height();
+
+                // Adjust Pan Calculation ---
+                // Align LEFT edge with padding + offset
                 const targetPanX = padding.left + extraHorizontalOffset - (bb.x1 * targetZoom);
-                const targetPanY = (viewportHeight / 2) - ((bb.y1 + bb.h / 2) * targetZoom);
+                // Align TOP edge near top padding (instead of centering vertically)
+                const targetPanY = padding.top - (bb.y1 * targetZoom);
                 console.log(`Calculated Pan: targetPanX=${targetPanX.toFixed(2)}, targetPanY=${targetPanY.toFixed(2)}`);
 
-                // Apply zoom and pan together using viewport
+                // Apply zoom and pan together
                 cy.viewport({
                     zoom: targetZoom,
                     pan: { x: targetPanX, y: targetPanY }
@@ -110,11 +110,9 @@ export async function initializeVisualization(containerSelector) {
 
 
         // Temporary zoom logger to catch ideal zoom level, rounded to 3 decimals
-        cy.on('zoom', function() {
-            console.log('Current zoom level:', cy.zoom().toFixed(3));
-        });
-
-        // ***** After initially looking at things, it appears around zoom: .800 is a good default for the initial view. *****      
+        //cy.on('zoom', function() {
+        //    console.log('Current zoom level:', cy.zoom().toFixed(3));
+        //});
 
         // Return object containing the cy instance
         return { cy: cy };

@@ -342,3 +342,24 @@ button#reset-filters-btn svg { /* Style the icon inside */
     font-size: 0.9em;
     white-space: nowrap; /* Prevent wrapping */
 }
+
+/* Graph States */
+/* Styling for filtered-out elements */
+.filtered-out {
+    opacity: 0.15; /* Make elements very transparent */
+    /* Optional: Prevent interaction with faded elements */
+    /* pointer-events: none; */
+    transition: opacity 0.25s ease-in-out; /* Smooth fade effect */
+}
+
+/* Ensure parent nodes also fade */
+node:parent.filtered-out {
+    background-opacity: 0.05; /* Make background even fainter */
+    border-opacity: 0.3;
+    /* Opacity on the parent itself also applies */
+}
+
+/* Make edges even fainter when filtered out */
+edge.filtered-out {
+    opacity: 0.1;
+}
